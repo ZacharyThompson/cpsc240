@@ -1,0 +1,168 @@
+     1                                  ;----------------------------------------------------------------------------------------------------------------------------
+     2                                  ;Program name: "Sum of Array".
+     3                                  ;This program takes in float numbers from the user and returns the sum of those numbers.
+     4                                  ;Copyright (C) 2021 Zachary Thompson.
+     5                                  ;
+     6                                  ;This file is part of the software program "Sum of Array".
+     7                                  ;Sum of Array is free software: you can redistribute it and/or modify it under the terms of the GNU
+     8                                  ;General Public License version 3 as published by the Free Software Foundation.
+     9                                  ;Sum of Array is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    10                                  ;warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+    11                                  ;A copy of the GNU General Public License v3 is available here:  <https://www.gnu.org/licenses/>.
+    12                                  ;----------------------------------------------------------------------------------------------------------------------------
+    13                                  ;Author information
+    14                                  ;  Author name: Zachary Thompson
+    15                                  ;  Author email: zachth1723@csu.fullerton.edu
+    16                                  ;
+    17                                  ;Program information
+    18                                  ;  Program name: Sum of Array
+    19                                  ;  Programming languages: One module in C Language, One module in C++, and Three modules in X86.
+    20                                  ;  Correct Platform: GNU/Linux with Bash shell.
+    21                                  ;  Date program began: 2021-Mar-06
+    22                                  ;  Date of last update: 2021-Mar-21
+    23                                  ;  Files in this program: control.asm, display.cpp, fill.asm, main.c, sum.asm
+    24                                  ;  Status: Complete.
+    25                                  ;
+    26                                  ;Purpose
+    27                                  ;  Compute the sum of the float numbers contained in an array.
+    28                                  ;
+    29                                  ;This file
+    30                                  ;  File name: control.asm
+    31                                  ;  Language: X86 with Intel syntax
+    32                                  ;  Assemble: nasm -f elf64 -l control.lis -o control.o control.asm
+    33                                  ;  Link: g++ -m64 -fno-pie -no-pie -o arraysum.out control.o display.o fill.o main.o sum.o
+    34                                  ;----- Begin code area ------------------------------------------------------------------------------------------------------
+    35                                  extern display
+    36                                  extern fill
+    37                                  extern printf
+    38                                  extern sum
+    39                                  global control
+    40                                  
+    41                                  section .data
+    42                                  
+    43                                  MAX_SIZE equ 100 ;Maximum number of elements in the array
+    44 00000000 57656C636F6D652074-     welcome db "Welcome to HSAS.  The accuracy and reliability of this program is guaranteed by Zachary Thompson.",10,0
+    44 00000009 6F20485341532E2020-
+    44 00000012 546865206163637572-
+    44 0000001B 61637920616E642072-
+    44 00000024 656C696162696C6974-
+    44 0000002D 79206F662074686973-
+    44 00000036 2070726F6772616D20-
+    44 0000003F 69732067756172616E-
+    44 00000048 74656564206279205A-
+    44 00000051 616368617279205468-
+    44 0000005A 6F6D70736F6E2E0A00 
+    45 00000063 546865206E756D6265-     entered db "The numbers you entered are these:",10,0
+    45 0000006C 727320796F7520656E-
+    45 00000075 746572656420617265-
+    45 0000007E 2074686573653A0A00 
+    46 00000087 5468652073756D206F-     display_sum db "The sum of these values is %.8lf.",10,0
+    46 00000090 662074686573652076-
+    46 00000099 616C75657320697320-
+    46 000000A2 252E386C662E0A00   
+    47 000000AA 54686520636F6E7472-     goodbye db "The control module will now return the sum to the caller module.",10,0
+    47 000000B3 6F6C206D6F64756C65-
+    47 000000BC 2077696C6C206E6F77-
+    47 000000C5 2072657475726E2074-
+    47 000000CE 68652073756D20746F-
+    47 000000D7 207468652063616C6C-
+    47 000000E0 6572206D6F64756C65-
+    47 000000E9 2E0A00             
+    48                                  
+    49                                  section .bss
+    50                                  
+    51 00000000 <res 320h>              nums resq MAX_SIZE ;Array of floats
+    52 00000320 ????????????????        size resq 1 ;Keeps track of the # of elements in the array
+    53 00000328 ????????????????        sum_val resq 1 ;Sum of all elements in the array
+    54                                  
+    55                                  section .text
+    56                                  
+    57                                  control:
+    58                                  
+    59                                  ;Set up new stack frame
+    60 00000000 55                      push rbp
+    61 00000001 4889E5                  mov  rbp,rsp
+    62                                  
+    63                                  ;Prolog ----- Insurance for any caller of this assembly module -----
+    64                                  ;Any future program calling this module that the data in the caller's GPRs will not be modified.
+    65 00000004 57                      push rdi                                                    ;Backup rdi
+    66 00000005 56                      push rsi                                                    ;Backup rsi
+    67 00000006 52                      push rdx                                                    ;Backup rdx
+    68 00000007 51                      push rcx                                                    ;Backup rcx
+    69 00000008 4150                    push r8                                                     ;Backup r8
+    70 0000000A 4151                    push r9                                                     ;Backup r9
+    71 0000000C 4152                    push r10                                                    ;Backup r10
+    72 0000000E 4153                    push r11                                                    ;Backup r11
+    73 00000010 4154                    push r12                                                    ;Backup r12
+    74 00000012 4155                    push r13                                                    ;Backup r13
+    75 00000014 4156                    push r14                                                    ;Backup r14
+    76 00000016 4157                    push r15                                                    ;Backup r15
+    77 00000018 53                      push rbx                                                    ;Backup rbx
+    78 00000019 9C                      pushf                                                       ;Backup rflags
+    79                                  
+    80                                  ;Display welcome message
+    81 0000001A B800000000              mov rax, 0
+    82 0000001F 48BF-                   mov rdi, welcome
+    82 00000021 [0000000000000000] 
+    83 00000029 E8(00000000)            call printf
+    84                                  
+    85                                  ;Fill the array with values provided by the user
+    86 0000002E 48BF-                   mov rdi, nums
+    86 00000030 [0000000000000000] 
+    87 00000038 BE64000000              mov rsi, MAX_SIZE
+    88 0000003D E8(00000000)            call fill
+    89 00000042 48890425[20030000]      mov [size], rax ;Save size value returned by fill
+    90                                  
+    91                                  ;Calculate the sum of all the numbers in the array
+    92 0000004A 48BF-                   mov rdi, nums
+    92 0000004C [0000000000000000] 
+    93 00000054 488B3425[20030000]      mov rsi, [size]
+    94 0000005C E8(00000000)            call sum
+    95 00000061 F20F110425-             movsd [sum_val], xmm0 ;Save sum value returned by sum
+    95 00000066 [28030000]         
+    96                                  
+    97                                  ;Display all numbers in the array to the user
+    98 0000006A B800000000              mov rax, 0
+    99 0000006F 48BF-                   mov rdi, entered
+    99 00000071 [6300000000000000] 
+   100 00000079 E8(00000000)            call printf
+   101 0000007E 48BF-                   mov rdi, nums
+   101 00000080 [0000000000000000] 
+   102 00000088 488B3425[20030000]      mov rsi, [size]
+   103 00000090 E8(00000000)            call display
+   104                                  
+   105                                  ;Display the sum to the user
+   106 00000095 B801000000              mov rax, 1
+   107 0000009A 48BF-                   mov rdi, display_sum
+   107 0000009C [8700000000000000] 
+   108 000000A4 F20F100425-             movsd xmm0, [sum_val]
+   108 000000A9 [28030000]         
+   109 000000AD E8(00000000)            call printf
+   110                                  
+   111                                  ;Display goodbye message
+   112 000000B2 B800000000              mov rax, 0
+   113 000000B7 48BF-                   mov rdi, goodbye
+   113 000000B9 [AA00000000000000] 
+   114 000000C1 E8(00000000)            call printf
+   115                                  
+   116 000000C6 F20F100425-             movsd xmm0, [sum_val] ;Return sum value to caller
+   116 000000CB [28030000]         
+   117                                  
+   118                                  ;----- Restore original values to integer registers -----
+   119 000000CF 9D                      popf    ;Restore rflags
+   120 000000D0 5B                      pop rbx ;Restore rbx
+   121 000000D1 415F                    pop r15 ;Restore r15
+   122 000000D3 415E                    pop r14 ;Restore r14
+   123 000000D5 415D                    pop r13 ;Restore r13
+   124 000000D7 415C                    pop r12 ;Restore r12
+   125 000000D9 415B                    pop r11 ;Restore r11
+   126 000000DB 415A                    pop r10 ;Restore r10
+   127 000000DD 4159                    pop r9  ;Restore r9
+   128 000000DF 4158                    pop r8  ;Restore r8
+   129 000000E1 59                      pop rcx ;Restore rcx
+   130 000000E2 5A                      pop rdx ;Restore rdx
+   131 000000E3 5E                      pop rsi ;Restore rsi
+   132 000000E4 5F                      pop rdi ;Restore rdi
+   133 000000E5 5D                      pop rbp ;Restore rbp
+   134                                  
+   135 000000E6 C3                      ret ;Return to caller
