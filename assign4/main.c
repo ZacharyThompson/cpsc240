@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------------------------------------
 Program name: "Interview".
-This program <+++++>
+This program conducts a job interview accounting for 3 types of programmers: social science majors, CS majors, and assembly programmer.
 Copyright (C) 2021 Zachary Thompson.
 
 This file is part of the software program "Interview".
@@ -16,7 +16,7 @@ Author information
 
 Program information
   Program name: Interview
-  Programming languages: One module in C Languageand one module in X86.
+  Programming languages: One module in C Language and one module in X86.
   Correct Platform: GNU/Linux with Bash shell.
   Date program began: 2021-Apr-13
   Date of last update: 2021-Apr-25
@@ -24,7 +24,7 @@ Program information
   Status: Complete.
 
 Purpose
-  <+++++>
+  This program conducts a job interview accounting for 3 types of programmers: social science majors, CS majors, and assembly programmer.
 
 This file
   File name: main.c
@@ -38,20 +38,35 @@ extern double interview(char name[], double expected);
 int main()
 {
 	char name[50];
-	double expected;
+	double salary, expected;
 
 	puts("Welcome to Software Analysis by Paramount Programmers, Inc.");
 	puts("Please enter your first and last names and press enter: ");
-	scanf("%s", name);
+	fgets(name, 50, stdin);
 
 	printf("Please enter your expected annual salary when employed at Paramount: ");
-	scanf("%lf", expected);
+	scanf("%lf", &expected);
 	printf("Thank you %s.  Our records show that you applied for employment her with our agency a week ago.\n", name);
 	puts("Your interview with Ms Linda Fenster, Personnel Manager, will begin shortly.");
 
-	double salary = interview(name, expected);
-	printf("Hello %s I am the receptionist.\n", name);
-	printf("This envelope contains your job offer with starting salary %lf.  Please check back on Monday morning at 8am.\nBye\n", salary);
+	salary = interview(name, expected);
+
+	if (salary == 88000.88) { // CS Major
+		printf("Hello %s I am the receptionist.\n", name);
+		puts("This envelope contains your job offer with starting salary 88000.88.");
+		puts("Please check back on Monday morning at 8am.");
+		puts("Bye");
+	} else if (salary == 1000000.00) { // Chris Sawyer
+		puts("Hello Mr. Sawyer. I am the receptionist.");
+		puts("This envelope contains your job offer starting at 1 million annual.");
+		puts("Please start any time you like. In the middle time our CTO wishes to have dinner with you.");
+		puts("Have very nice evening Mr Sawyer.");
+	} else if (salary == 1200.12) {// Social Science Major
+		printf("Hello %s I am the receptionist.\n", name);
+		puts("We have an opening for you in the company cafeteria for $1200.12 annually.");
+		puts("Take your time to let use know your decision.");
+		puts("Bye");
+	}
 
 	return 0;
 }
