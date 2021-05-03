@@ -33,11 +33,20 @@
 ;  Link: g++ -m64 -fno-pie -no-pie -o interview.out interview.o main.o
 ;----- Begin code area ------------------------------------------------------------------------------------------------------
 extern printf
+extern scanf
 global interview
 
 section .data
-welcome db "Hello %s. I am Ms Fenster. The interview will begin now."
-
+welcome db "Hello %s. I am Ms Fenster. The interview will begin now.",10,0
+whoareyou db "Wow! $%lf  That's a lot of cash.  Who do you think you are, Chris Sawyer (y or n)?",10,0
+electricity db "Alright.  Now we will work on your electricity.",10,0
+resistance1 db "Please enter the resistance of circuit #1 in ohms: ",10,0
+resistance2 db "What is the resistance of circuit #2 in ohms: ",10,0
+total db "The total resistance is %lf Ohms.",10,0
+wereyoucs db "Were you a computer science major (y or n)?",10,0
+goodbye db "Thank you.  Please follow the exit signs to the front desk.",10,0
+float_format db "%lf",0
+char_format db "%c",0
 
 section .bss
 name resq 1 ;name array
@@ -75,6 +84,13 @@ movsd [expected], xmm0 ;expected salary passed by main()
 mov rax, 0
 mov rdi, welcome
 call printf
+
+;Display message asking if they are Chris Sawyer
+mov rax, 1
+mov rdi, whoareyou
+mov xmm0, [expected]
+call printf
+
 
 
 mov xmm0, [expected]
