@@ -1,6 +1,7 @@
 /*---------------------------------------------------------------------------------------------------------------------------
 Program name: "Interview".
-This program conducts a job interview accounting for 3 types of programmers: social science majors, CS majors, and assembly programmer.
+This program conducts a job interview accounting for 3 types of programmers:
+social science majors, CS majors, and assembly programmer.
 Copyright (C) 2021 Zachary Thompson.
 
 This file is part of the software program "Interview".
@@ -19,12 +20,13 @@ Program information
   Programming languages: One module in C Language and one module in X86.
   Correct Platform: GNU/Linux with Bash shell.
   Date program began: 2021-Apr-13
-  Date of last update: 2021-Apr-25
+  Date of last update: 2021-May-10
   Files in this program: interview.asm, main.c
   Status: Complete.
 
 Purpose
-  This program conducts a job interview accounting for 3 types of programmers: social science majors, CS majors, and assembly programmer.
+  This program conducts a job interview accounting for 3 types of programmers:
+  social science majors, CS majors, and assembly programmer.
 
 This file
   File name: main.c
@@ -33,7 +35,8 @@ This file
   Link: g++ -m64 -fno-pie -no-pie -o interview.out interview.o main.o
 ----- Begin code area -----------------------------------------------------------------------------------------------------*/
 #include <stdio.h>
-extern double interview(char name[], double expected);
+#include <string.h>
+extern double interview(char *name, double expected);
 
 int main()
 {
@@ -44,9 +47,16 @@ int main()
 	puts("Please enter your first and last names and press enter: ");
 	fgets(name, 50, stdin);
 
+	/* Remove newline at end of string
+	 * Credit: Tim Čas
+	 * https://stackoverflow.com/a/28462221 */
+	name[strcspn(name, "\n")] = 0;
+
 	printf("Please enter your expected annual salary when employed at Paramount: ");
 	scanf("%lf", &expected);
-	printf("Thank you %s.  Our records show that you applied for employment her with our agency a week ago.\n", name);
+	while((getchar())!='\n'); 
+
+	printf("Thank you %s. Our records show that you applied for employment her with our agency a week ago.\n", name);
 	puts("Your interview with Ms Linda Fenster, Personnel Manager, will begin shortly.");
 
 	salary = interview(name, expected);

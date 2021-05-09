@@ -1,6 +1,7 @@
 ;----------------------------------------------------------------------------------------------------------------------------
 ;Program name: "Interview".
-;This program conducts a job interview accounting for 3 types of programmers: social science majors, CS majors, and assembly programmer.
+;This program conducts a job interview accounting for 3 types of programmers: 
+;social science majors, CS majors, and assembly programmer.
 ;Copyright (C) 2021 Zachary Thompson.
 ;
 ;This file is part of the software program "Interview".
@@ -19,12 +20,13 @@
 ;  Programming languages: One module in C Language and one module in X86.
 ;  Correct Platform: GNU/Linux with Bash shell.
 ;  Date program began: 2021-Apr-13
-;  Date of last update: 2021-Apr-25
+;  Date of last update: 2021-May-10
 ;  Files in this program: interview.asm, main.c
 ;  Status: Complete.
 ;
 ;Purpose
-;  This program conducts a job interview accounting for 3 types of programmers: social science majors, CS majors, and assembly programmer.
+;  This program conducts a job interview accounting for 3 types of programmers:
+;  social science majors, CS majors, and assembly programmer.
 ;
 ;This file
 ;  File name: interview.asm
@@ -34,6 +36,7 @@
 ;----- Begin code area ------------------------------------------------------------------------------------------------------
 extern printf
 extern scanf
+extern getchar
 global interview
 
 section .data
@@ -46,7 +49,10 @@ total db "The total resistance is %lf Ohms.",10,0
 wereyoucs db "Were you a computer science major (y or n)?",10,0
 goodbye db "Thank you.  Please follow the exit signs to the front desk.",10,0
 float_format db "%lf",0
-char_format db "%c",0
+
+million dq 1000000.0
+eightythousand dq 88000.88
+twelvehundred dq 1200.12
 
 section .bss
 name resq 1 ;name array
@@ -77,23 +83,116 @@ push r15                                                    ;Backup r15
 push rbx                                                    ;Backup rbx
 pushf                                                       ;Backup rflags
 
-mov name, rdi ;name passed by main()
+mov [name], rdi ;name passed by main()
 movsd [expected], xmm0 ;expected salary passed by main()
 
 ;Display welcome message
 mov rax, 0
 mov rdi, welcome
+mov rsi, [name]
 call printf
 
 ;Display message asking if they are Chris Sawyer
 mov rax, 1
 mov rdi, whoareyou
-mov xmm0, [expected]
+movsd xmm0, [expected]
 call printf
 
+mov rax, 0
+call getchar
+cmp rax, 'y'
+je sawyer
+
+;----- Electricity -----
+mov rax, 0
+mov rdi, electricity
+call printf
+
+;--1st resistance--
+mov rax, 0
+mov rdi, resistance1
+call printf
+
+push qword 0
+push qword 0
+mov rax, 1
+mov rdi, float_format
+mov rsi, rsp
+call scanf
+
+movsd xmm14, [rsp]
+pop rax
+pop rax
+
+;--2nd resistance--
+mov rax, 0
+mov rdi, resistance2
+call printf
+
+push qword 0
+push qword 0
+mov rax, 1
+mov rdi, float_format
+mov rsi, rsp
+call scanf
+
+movsd xmm13, [rsp]
+pop rax
+pop rax
+
+;--Calculating total resistance--
+movsd xmm5, xmm14
+movsd xmm4, xmm14
+movsd xmm3, xmm13
+
+mulsd xmm5, xmm3
+addsd xmm4, xmm3
+
+movsd xmm12, xmm5
+divsd xmm12, xmm4
+
+mov rax, 1
+mov rdi, total
+movsd xmm0, xmm12
+call printf
+;----- End of Electricity -----
+
+;Ask if user was a CS major
+mov rax, 0
+mov rdi, wereyoucs
+call printf
+
+;Remove newline
+mov rax, 0
+call getchar
+
+mov rax, 0
+call getchar
+cmp rax, 'y'
+je csmajor
+jne othermajor
+
+;----- 3 Possibilities -----
+csmajor:
+movq xmm15, [eightythousand]
+jmp conclusion
+
+sawyer:
+movq xmm15, [million]
+jmp conclusion
+
+othermajor:
+movq xmm15, [twelvehundred]
+jmp conclusion
 
 
-mov xmm0, [expected]
+conclusion:
+
+mov rax, 0
+mov rdi, goodbye
+call printf
+
+movsd xmm0, xmm15
 
 ;----- Restore original values to integer registers -----
 popf    ;Restore rflags
