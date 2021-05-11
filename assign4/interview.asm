@@ -40,6 +40,7 @@ extern getchar
 global interview
 
 section .data
+
 welcome db "Hello %s. I am Ms Fenster. The interview will begin now.",10,0
 whoareyou db "Wow! $%lf  That's a lot of cash.  Who do you think you are, Chris Sawyer (y or n)?",10,0
 electricity db "Alright.  Now we will work on your electricity.",10,0
@@ -48,6 +49,7 @@ resistance2 db "What is the resistance of circuit #2 in ohms: ",10,0
 total db "The total resistance is %lf Ohms.",10,0
 wereyoucs db "Were you a computer science major (y or n)?",10,0
 goodbye db "Thank you.  Please follow the exit signs to the front desk.",10,0
+
 float_format db "%lf",0
 
 million dq 1000000.0
@@ -86,33 +88,37 @@ pushf                                                       ;Backup rflags
 mov [name], rdi ;name passed by main()
 movsd [expected], xmm0 ;expected salary passed by main()
 
-;Display welcome message
+;Print welcome message
 mov rax, 0
 mov rdi, welcome
 mov rsi, [name]
 call printf
 
-;Display message asking if they are Chris Sawyer
+;Print message asking if they are Chris Sawyer
 mov rax, 1
 mov rdi, whoareyou
 movsd xmm0, [expected]
 call printf
 
+;If they answer yes jump to 'sawyer' label
 mov rax, 0
 call getchar
 cmp rax, 'y'
 je sawyer
 
 ;----- Electricity -----
+;Print electricity section intro
 mov rax, 0
 mov rdi, electricity
 call printf
 
 ;--1st resistance--
+;Print 1st resistance prompt
 mov rax, 0
 mov rdi, resistance1
 call printf
 
+;Get resistance 1 float value from user
 push qword 0
 push qword 0
 mov rax, 1
@@ -120,15 +126,17 @@ mov rdi, float_format
 mov rsi, rsp
 call scanf
 
-movsd xmm14, [rsp]
+movsd xmm14, [rsp] ;Resistance 1 in xmm14
 pop rax
 pop rax
 
 ;--2nd resistance--
+;Print 2nd resistance prompt
 mov rax, 0
 mov rdi, resistance2
 call printf
 
+;Get resistance 2 float value from user
 push qword 0
 push qword 0
 mov rax, 1
@@ -136,36 +144,41 @@ mov rdi, float_format
 mov rsi, rsp
 call scanf
 
-movsd xmm13, [rsp]
+movsd xmm13, [rsp] ;Resistance 2 in xmm13
 pop rax
 pop rax
 
 ;--Calculating total resistance--
-movsd xmm5, xmm14
-movsd xmm4, xmm14
-movsd xmm3, xmm13
 
-mulsd xmm5, xmm3
-addsd xmm4, xmm3
+;Copy values into other registers to make math easier
+movsd xmm5, xmm14 ;R1
+movsd xmm4, xmm14 ;R1
+movsd xmm3, xmm13 ;R2
 
-movsd xmm12, xmm5
-divsd xmm12, xmm4
+mulsd xmm5, xmm3 ;R1 * R2
+addsd xmm4, xmm3 ;R1 + R2
 
+movsd xmm12, xmm5 
+divsd xmm12, xmm4 ;(R1*R2) / (R1+R2)
+
+;Print calculated total resistance
 mov rax, 1
 mov rdi, total
 movsd xmm0, xmm12
 call printf
 ;----- End of Electricity -----
 
-;Ask if user was a CS major
+;Print message asking if user was a CS major
 mov rax, 0
 mov rdi, wereyoucs
 call printf
 
-;Remove newline
+;Remove newline from input buffer
 mov rax, 0
 call getchar
 
+;If they answer yes, jump to 'csmajor' label
+;If no, then jump to 'othermajor' label
 mov rax, 0
 call getchar
 cmp rax, 'y'
@@ -173,6 +186,10 @@ je csmajor
 jne othermajor
 
 ;----- 3 Possibilities -----
+
+;Put offered salaries in xmm15
+;and jump to the conclusion
+
 csmajor:
 movq xmm15, [eightythousand]
 jmp conclusion
@@ -186,12 +203,15 @@ movq xmm15, [twelvehundred]
 jmp conclusion
 
 
+;----- CONCLUSION -----
 conclusion:
 
+;Print goodbye message
 mov rax, 0
 mov rdi, goodbye
 call printf
 
+;Return offered salary
 movsd xmm0, xmm15
 
 ;----- Restore original values to integer registers -----

@@ -59,6 +59,7 @@ int main()
 	printf("Thank you %s. Our records show that you applied for employment her with our agency a week ago.\n", name);
 	puts("Your interview with Ms Linda Fenster, Personnel Manager, will begin shortly.");
 
+	// interview() returns offered salary
 	salary = interview(name, expected);
 
 	if (salary == 88000.88) { // CS Major
