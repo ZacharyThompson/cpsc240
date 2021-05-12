@@ -4,9 +4,7 @@
 #Author: Zachary Thompson
 
 #Delete some un-needed files
-rm *.o
-rm *.lis
-rm *.out
+rm *.o *.lis *.out
 
 echo "Assemble interview.asm."
 nasm -f elf64 -l interview.lis -o interview.o interview.asm -g -gdwarf
