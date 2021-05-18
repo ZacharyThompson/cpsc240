@@ -143,20 +143,18 @@ pop rax
 ;--Calculating total resistance--
 
 ;Copy values into other registers to make math easier
-movsd xmm5, xmm14 ;R1
-movsd xmm4, xmm14 ;R1
-movsd xmm3, xmm13 ;R2
+;xmm14 = R1, xmm13 = R2
+movsd xmm12, xmm14 ;Copy of R1
 
-mulsd xmm5, xmm3 ;R1 * R2
-addsd xmm4, xmm3 ;R1 + R2
+mulsd xmm14, xmm13 ;R1 * R2
+addsd xmm12, xmm13 ;R1 + R2
 
-movsd xmm12, xmm5 
-divsd xmm12, xmm4 ;(R1*R2) / (R1+R2)
+divsd xmm14, xmm12 ;(R1*R2) / (R1+R2)
 
 ;Print calculated total resistance
 mov rax, 1
 mov rdi, total
-movsd xmm0, xmm12
+movsd xmm0, xmm14
 call printf
 ;----- End of Electricity -----
 
