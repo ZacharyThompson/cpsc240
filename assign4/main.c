@@ -40,17 +40,13 @@ extern double interview(char *name, double expected);
 
 int main()
 {
-	char name[50];
+	char name[100];
 	double salary, expected;
 
 	puts("Welcome to Software Analysis by Paramount Programmers, Inc.");
 	puts("Please enter your first and last names and press enter: ");
-	fgets(name, 50, stdin);
-
-	/* Remove newline at end of string
-	 * Credit: Tim Čas
-	 * https://stackoverflow.com/a/28462221 */
-	name[strcspn(name, "\n")] = 0;
+	scanf("%[^\n]s", name);
+	while((getchar())!='\n'); // Remove newline in input buffer
 
 	printf("Please enter your expected annual salary when employed at Paramount: ");
 	scanf("%lf", &expected);
