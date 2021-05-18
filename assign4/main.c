@@ -20,7 +20,7 @@ Program information
   Programming languages: One module in C Language and one module in X86.
   Correct Platform: GNU/Linux with Bash shell.
   Date program began: 2021-Apr-13
-  Date of last update: 2021-May-10
+  Date of last update: 2021-May-17
   Files in this program: interview.asm, main.c
   Status: Complete.
 
