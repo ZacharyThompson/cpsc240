@@ -52,14 +52,6 @@ goodbye db "Thank you.  Please follow the exit signs to the front desk.",10,0
 
 float_format db "%lf",0
 
-million dq 1000000.0
-eightythousand dq 88000.88
-twelvehundred dq 1200.12
-
-section .bss
-name resq 1 ;name array
-expected resq 1 ;expected salary
-
 section .text
 
 interview:
@@ -85,19 +77,19 @@ push r15                                                    ;Backup r15
 push rbx                                                    ;Backup rbx
 pushf                                                       ;Backup rflags
 
-mov [name], rdi ;name passed by main()
-movsd [expected], xmm0 ;expected salary passed by main()
+mov r15, rdi ;name passed by main()
+movsd xmm7, xmm0 ;expected salary passed by main()
 
 ;Print welcome message
 mov rax, 0
 mov rdi, welcome
-mov rsi, [name]
+mov rsi, r15 ;name
 call printf
 
 ;Print message asking if they are Chris Sawyer
 mov rax, 1
 mov rdi, whoareyou
-movsd xmm0, [expected]
+movsd xmm0, xmm7 ;expected salary
 call printf
 
 ;If they answer yes jump to 'sawyer' label
@@ -191,15 +183,18 @@ jne othermajor
 ;and jump to the conclusion
 
 csmajor:
-movq xmm15, [eightythousand]
+mov rax, 0x40F57C0E147AE148 ;88000.88 Hex Representation
+movq xmm15, rax
 jmp conclusion
 
 sawyer:
-movq xmm15, [million]
+mov rax, 1000000
+cvtsi2sd xmm15, rax
 jmp conclusion
 
 othermajor:
-movq xmm15, [twelvehundred]
+mov rax, 0x4092C07AE147AE14 ;1200.12 Hex Representation
+movq xmm15, rax
 jmp conclusion
 
 
