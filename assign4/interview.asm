@@ -92,7 +92,7 @@ mov rdi, whoareyou
 movsd xmm0, xmm7 ;expected salary
 call printf
 
-;If they answer yes jump to 'sawyer' label
+;If they answer yes, jump to 'sawyer' label
 mov rax, 0
 call getchar
 cmp rax, 'y'
